@@ -1,0 +1,87 @@
+//Floader.cpp
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Floater.h"
+
+// Sets default values
+AFloater::AFloater()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CustomStaticMesh"));
+
+	InitialLocation = FVector(0.0f);
+	PlacedLocation = FVector(0.0f);
+
+	bInitializeFloaterLocations = false;
+}
+
+// Called when the game starts or when spawned
+void AFloater::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	PlacedLocation = GetActorLocation();
+
+	if (bInitializeFloaterLocations) 
+	{
+		SetActorLocation(InitialLocation);
+	}
+	
+
+}
+
+// Called every frame
+void AFloater::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+//Floader.h
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Floater.generated.h"
+
+UCLASS()
+class FIRSTPROJECT_API AFloater : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AFloater();
+
+	UPROPERTY(VisibleAnywhere, Category = "ActorMeshComponents")
+
+	UStaticMeshComponent* StaticMesh;
+
+
+	//BeginPlay 被调用时 SetActorLocation 放置 Vector 的位置
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Floater Variables")
+	FVector InitialLocation;
+
+	// Location 是当 Actor 拖拽到世界中的位置
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Floater Variables")
+	FVector PlacedLocation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Floater Variables")
+	bool bInitializeFloaterLocations;
+
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+};
