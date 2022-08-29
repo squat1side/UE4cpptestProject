@@ -1,0 +1,166 @@
+//.cpp
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Floater.h"
+#include "Components/StaticMeshComponent.h"
+
+// Sets default values
+AFloater::AFloater()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CustomStaticMesh"));
+
+	InitialLocation = FVector(0.0f);
+	PlacedLocation = FVector(0.0f);
+	WorldOrigin = FVector(0.0f, 0.0f, 0.0f);
+
+	InitiaDirection = FVector(0.0f, 0.0f, 0.0f);
+
+	bInitializeFloaterLocations = false;
+	bShouldFloat = false;
+
+	InitialForce = FVector(2000000.f, 0.0f, 0.0f);
+	InitialTorque = FVector(2000000.f, 0.0f, 0.0f);
+
+	RunningTime = 0.f;
+
+	A = 0.f;
+	B = 0.f;
+	C = 0.f;
+	D = 0.f;
+
+
+}
+
+// Called when the game starts or when spawned
+void AFloater::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	float InitialX = FMath::FRandRange(-500.f, 500.f);
+	float InitialY = FMath::FRandRange(-500.f, 500.f);
+	float InitialZ = FMath::FRandRange(0.f, 500.f);
+
+	InitialLocation.X = InitialX;
+	InitialLocation.Y = InitialY;
+	InitialLocation.Z = InitialZ;
+
+
+	PlacedLocation = GetActorLocation();
+
+	if (bInitializeFloaterLocations) 
+	{
+		SetActorLocation(InitialLocation);
+	}
+
+	BaseZLocation = PlacedLocation.Z;
+
+
+}
+
+// Called every frame
+void AFloater::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bShouldFloat)
+	{
+		FVector NewLocation = GetActorLocation();
+
+		NewLocation.Z = BaseZLocation + A * FMath::Sin(B * RunningTime - C) + D;
+
+
+		SetActorLocation(NewLocation);
+		RunningTime += DeltaTime;
+
+	}
+
+}
+
+//.h
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Floater.generated.h"
+
+UCLASS()
+class FIRSTPROJECT_API AFloater : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AFloater();
+
+	
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "ActorMeshComponents")
+	UStaticMeshComponent* StaticMesh;
+
+	//BeginPlay 被调用时 SetActorLocation 放置 Vector 的位置
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Floater Variables")
+	FVector InitialLocation;
+
+	// Location 是当 Actor 拖拽到世界中的位置
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Floater Variables")
+	FVector PlacedLocation;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Floater Variables")
+	FVector WorldOrigin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	FVector InitiaDirection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	bool bShouldFloat;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Floater Variables")
+	bool bInitializeFloaterLocations;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "Floater Variables")
+	FVector InitialForce;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "Floater Variables")
+	FVector InitialTorque;
+
+private:
+
+	float RunningTime;
+
+	float BaseZLocation;
+
+public:
+	//幅度 - 上下移动的距离
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	float A;
+
+	//周期 - 乘以B的绝对值
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	float B;
+
+	//相位偏移 - （C / B)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	float C;
+
+	//垂直偏移 D
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Floater Variables")
+	float D;
+
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+};
