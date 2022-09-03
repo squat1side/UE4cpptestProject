@@ -5,6 +5,9 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Components/InputComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ACollider::ACollider()
@@ -32,6 +35,18 @@ ACollider::ACollider()
 
 	}
 
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetRootComponent());
+	SpringArm->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
+	SpringArm->TargetArmLength = 400.f;//弹簧臂
+	SpringArm->bEnableCameraLag = true;//布尔值bEnableCameraLag- 为真CameraLag就会紧跟Pawn后面；
+	SpringArm->CameraLagSpeed = 3.0f;//紧跟Pwan的cameralag的速度初始值
+
+	//创建Camera
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);//将摄像机附加到弹簧臂上
+
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 }
 
@@ -54,5 +69,20 @@ void ACollider::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ACollider::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ACollider::MoveRight);
+
 }
 
+//利用ACollider::来完全限制MoveForward和MoveRight
+void ACollider::MoveForward(float input)
+{
+	FVector Forward = GetActorForwardVector();
+	AddMovementInput(input * Forward);
+}
+
+void ACollider::MoveRight(float input)
+{
+	FVector Right = GetActorRightVector();
+	AddMovementInput(input * Right);
+}
