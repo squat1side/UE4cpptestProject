@@ -1,0 +1,41 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Pickup.h"
+
+
+APickup::APickup()
+{
+
+}
+
+
+void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//OnOverlapBegin对Super的调用
+	//将需要的参数从实际的OnOverlapBegin中获取，被传递的参数放置父类函数Super
+	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	UE_LOG(LogTemp, Warning, TEXT("Pickup::OnOverlapBegin()"));
+}
+
+void APickup::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+
+	UE_LOG(LogTemp, Warning, TEXT("Pickup::OnOverlapEnd()"));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
